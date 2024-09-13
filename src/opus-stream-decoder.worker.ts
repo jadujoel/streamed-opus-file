@@ -33,9 +33,15 @@ async function start(
    * @param {{left: Float32Array, right: Float32Array, samplesDecoded: number, sampleRate: number}} obj
    */
   const onDecode = ({left, right, samplesDecoded}: OndecodeProps) => {
+    const l16 = new Int16Array(left.length)
+    const r16 = new Int16Array(right.length)
+    for (let i = 0; i < left.length; i++) {
+      l16[i] = left[i] * 0x7FFF
+      r16[i] = right[i] * 0x7FFF
+    }
     self.postMessage({
-      left: left.buffer,   // Use buffer for transferable object
-      right: right.buffer, // Use buffer for transferable object
+      left: l16.buffer,   // Use buffer for transferable object
+      right: r16.buffer, // Use buffer for transferable object
       index: totalSamplesDecoded
     }, [left.buffer as ArrayBuffer, right.buffer as ArrayBuffer]); // Transfer the buffers for efficiency
     totalSamplesDecoded += samplesDecoded

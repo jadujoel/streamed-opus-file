@@ -1,8 +1,8 @@
 console.log(globalThis)
 
 class StreamAudioProcessor extends globalThis.AudioWorkletProcessor {
-  leftBuffer: Float32Array = new Float32Array(globalThis.sampleRate * 390);
-  rightBuffer: Float32Array = new Float32Array(globalThis.sampleRate * 390);
+  leftBuffer: Int16Array = new Int16Array(globalThis.sampleRate * 390);
+  rightBuffer: Int16Array = new Int16Array(globalThis.sampleRate * 390);
   first = true;
   index: number = 0;
   existingSamples: number = 0;
@@ -11,11 +11,13 @@ class StreamAudioProcessor extends globalThis.AudioWorkletProcessor {
 
     this.port.onmessage = (ev: MessageEvent<{ left: ArrayBuffer, right: ArrayBuffer, index: number }>) => {
       const { left, right, index } = ev.data;
-      if (index > this.leftBuffer.length) {
+      const leftArr = new Int16Array(left)
+      const rightArr = new Int16Array(right)
+      if (index + leftArr.length > this.leftBuffer.length) {
         return
       }
-      this.leftBuffer.set(new Float32Array(left), index);
-      this.rightBuffer.set(new Float32Array(right), index);
+      this.leftBuffer.set(leftArr, index);
+      this.rightBuffer.set(rightArr, index);
     };
   }
 
@@ -34,8 +36,8 @@ class StreamAudioProcessor extends globalThis.AudioWorkletProcessor {
 
       for (let i = 0; i < leftChannel.length; i++) {
         const sourceIndex = this.index + i
-        leftChannel[i] = this.leftBuffer[sourceIndex] || 0;
-        rightChannel[i] = this.rightBuffer[sourceIndex] || 0;
+        leftChannel[i] = (this.leftBuffer[sourceIndex] || 0) / 0x7FFF;
+        rightChannel[i] = (this.rightBuffer[sourceIndex] || 0) / 0x7FFF;
       }
       this.index += leftChannel.length;
     }

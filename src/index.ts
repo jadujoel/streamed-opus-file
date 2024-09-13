@@ -10,8 +10,12 @@ async function main() {
   await context.audioWorklet.addModule(processorUrl);
 
   const node = new AudioWorkletNode(context, 'stream-audio-processor', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
-  decoder.addEventListener('message', (ev: MessageEvent<{ left: Float32Array, right: Float32Array, index: number }>) => {
-    node.port.postMessage(ev.data);
+  decoder.addEventListener('message', (ev: MessageEvent<{ left: ArrayBuffer, right: ArrayBuffer, index: number }>) => {
+    node.port.postMessage({
+      left: ev.data.left,
+      right: ev.data.right,
+      index: ev.data.index
+    }, [ev.data.left, ev.data.right])
   });
 
   node.connect(context.destination);
