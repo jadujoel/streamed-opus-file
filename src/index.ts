@@ -4,7 +4,7 @@ async function main() {
   const processorUrl = new URL('stream-audio-processor.js', import.meta.url).href;
   const opusUrl = new URL('48kb.2ch.366384529314489.opus', import.meta.url).href;
 
-  const context = new AudioContext();
+  const context = new AudioContext({ sampleRate: 48000});
 
   const decoder = new Worker(decoderUrl, { type: 'module' });
   await context.audioWorklet.addModule(processorUrl);
