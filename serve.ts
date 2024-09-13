@@ -5,7 +5,12 @@ Bun.serve({
     }
     const url = new URL(request.url);
     const pathname = url.pathname;
-    const path = pathname.endsWith('/') ? 'src/index.html' : `src${pathname}`;
+    let path = pathname.endsWith('/') ? 'src/index.html' : `src${pathname}`;
+    if (path.endsWith('.js')) {
+      path = path.replace('.js', '.ts');
+    }
+
+    console.log('Serving', path);
     const file = Bun.file(path);
     if (await file.exists()) {
       if (path.endsWith('.ts')) {

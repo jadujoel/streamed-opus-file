@@ -2,10 +2,13 @@ const scripts = await Array.fromAsync(new Bun.Glob('src/**/*{.ts,.js}').scan());
 await Bun.build({
   entrypoints: scripts,
   sourcemap: 'inline',
-  minify: true
+  minify: true,
+  outdir: 'dist'
 })
 
-const staticGlob = Array.fromAsync(new Bun.Glob('src/**/*{.html,.css,.wasm,.opus}').scan())
-for (const file of await staticGlob) {
-  await Bun.write(Bun.file(file), file.replace('src/', 'dist/'))
+const statics = await Array.fromAsync(new Bun.Glob('src/**/*{.html,.css,.wasm,.opus}').scan())
+for (const file of statics) {
+  await Bun.write(file.replace('src/', 'dist/'), Bun.file(file))
 }
+
+console.log({ scripts, statics})
