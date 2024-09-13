@@ -1,4 +1,4 @@
-main()
+document.querySelector('button')?.addEventListener('click', main);
 async function main() {
   const decoderUrl = new URL('opus-stream-decoder.worker.js', import.meta.url).href;
   const processorUrl = new URL('stream-audio-processor.js', import.meta.url).href;
